@@ -397,8 +397,18 @@ loop:
 
 			default:
 				// Path disallowed by robots.txt
-				f.visit(v, nil, ErrDisallowed)
-				wait = nil
+        // Commenting disallow robots options
+				//f.visit(v, nil, ErrDisallowed)
+				//wait = nil
+				// Path allowed, process the request
+				res, err := f.doRequest(v)
+				f.visit(v, res, err)
+				// No delay on error - the remote host was not reached
+				if err == nil {
+					wait = time.After(delay)
+				} else {
+					wait = nil
+				}
 			}
 			// Every time a command is received, reset the ttl channel
 			ttl = time.After(f.WorkerIdleTTL)
